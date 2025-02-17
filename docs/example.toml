@@ -1,0 +1,143 @@
+
+# 日志(list[object])
+[[logs]]
+# 日志输出(string)
+# 可选项: std/stdout/stderr/filename.ext
+# 默认: "std"
+output = ""
+# 日志等级(string)
+# 指定最低日志等级
+# 可选项: "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"
+# 默认: "WARNING"
+level = "DEBUG"
+# 日志格式(string)
+# 为FormatStringSyntax形式的字符串
+# 可选项: asctime,时间;levelname,等级;name,名称;message,消息;
+# 默认: "{levelname}: {message}"
+format = "{asctime} {name} {levelname}: {message}"
+# 日志日期格式(string)
+# 为StringFormatTime形式的字符串
+# 默认: "%Y-%m-%d %H:%M:%S"
+data_format = ""
+# 日志等级过滤(list[string])
+# 指定启用的日志等级;
+# 可选项: "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"
+# 默认: None
+level_filters = []
+# 日志名称过滤(list[string])
+# 指定启用的监视器名称
+# 默认: None
+name_filters = []
+# 日志内容过滤(list[string])
+# 日志过滤正则表达式
+# 默认: None
+msg_filters = []
+
+[[logs]]
+output = "E:\\abc.log"
+level = "DEBUG"
+format = "{asctime} {levelname}: {message}"
+
+
+# 监视器(list[object])
+[[watchers]]
+# 名称(string)
+# 格式: 常规字符串
+# 默认: "Watcher#+数组索引号"
+# name = "watcher_name"
+# 间隔时间(number)
+# 单位: 秒
+# 默认: 120
+interval = 5
+# 容忍次数(number)
+# 单位: 秒
+# 默认: 0
+tolerance = 3
+# 表达式(string)
+# 格式:
+#     fetch_N, 为fetches返回的集合, N索引号;
+#     empty, 空集合; any, 非空集合;
+#     &, 交集; |, 并集; -, 差集; ^, 对称差集;
+#     ==, 判断集合是否相等; !=, 判断集合是否不相等;
+#     <=, 判断集合的子集; >=, 判断集合的超集;
+#     <, 判断集合的真子集; >, 判断集合的真超集;
+# 默认: "fetch_1 & fetch_2 == empty"
+expression = "fetch_0 & fetch_1 == empty"
+
+# 获取当前(list[object])
+[[watchers.fetches]]
+# 插件类型名称
+# 必选项, 且不能为空
+plugin = "echo"
+# 超时时间(number)
+# 单位: 秒
+# 默认: 60
+timeout = 120
+# 重试次数(number)
+# 单位: 次
+# 默认: 0
+retries = 3
+# 重试间隔(number)
+# 单位: 秒
+# 默认: 1
+delay = 1
+# 执行策略(string)
+# 可选项: continue/success_stop/failure_stop
+# 默认: "continue"
+strategy = "continue"
+# 插件参数
+arg1 = "fetch_1 => {}"
+
+# 获取当前(list[object])
+[[watchers.fetches]]
+# 插件类型名称
+# 必选项, 且不能为空
+plugin = "echo"
+# 超时时间(number)
+# 单位: 秒
+# 默认: 60
+timeout = 120
+# 重试次数(number)
+# 单位: 次
+# 默认: 0
+retries = 3
+# 重试间隔(number)
+# 单位: 秒
+# 默认: 1
+delay = 1
+# 执行策略(string)
+# 可选项: continue/success_stop/failure_stop
+# 默认: "continue"
+strategy = "continue"
+# 插件参数
+arg1 = "fetch_2 => {fetches}"
+arg2 = "fetch_2 => {fetches[0].exception}"
+
+
+# 更新操作(list[object])
+[[watchers.executes]]
+# 插件类型名称
+# 必选项, 且不能为空
+plugin = "echo"
+# 超时时间(number)
+# 单位: 秒
+# 默认: 60
+timeout = 120
+# 重试次数(number)
+# 单位: 次
+# 默认: 0
+retries = 3
+# 重试间隔(number)
+# 单位: 秒
+# 默认: 1
+delay = 1
+# 执行策略(string)
+# 可选项: continue/success_stop/failure_stop
+# 默认: "continue"
+strategy = "continue"
+# 插件参数
+arg1 = "arg1"
+arg2 = "arg2"
+
+# [[watchers]]
+# expression = "fetch_1 & fetch_2 == empty"
