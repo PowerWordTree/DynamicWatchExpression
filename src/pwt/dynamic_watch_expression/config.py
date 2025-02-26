@@ -122,11 +122,15 @@ class Log(BaseModelEx):
             on_not_found="exception",
         ),
     ] = constants.LOG_OUTPUT_DEFAULT
+    output_format: Annotated[
+        constants.LOG_OUTPUT_FORMAT_TYPE,
+        convert(str.lower),
+    ] = constants.LOG_OUTPUT_FORMAT_DEFAULT
     level: Annotated[
         constants.LOG_LEVEL_TYPE,
         convert(str.upper),
     ] = constants.LOG_LEVEL_DEFAULT
-    format: Annotated[
+    text_format: Annotated[
         str,
         check(lambda value: logging.StrFormatStyle(value).validate()),
     ] = constants.LOG_FORMAT_DEFAULT
