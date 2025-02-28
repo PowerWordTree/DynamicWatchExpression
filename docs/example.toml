@@ -2,19 +2,23 @@
 # 日志(list[object])
 [[logs]]
 # 日志输出(string)
-# 可选项: std/stdout/stderr/filename.ext
+# 可选项: std/stdout/stderr/filepath
 # 默认: "std"
 output = ""
+# 日志输出格式(string)
+# 可选项: json/text
+# 默认: text
+output_format = "text"
 # 日志等级(string)
 # 指定最低日志等级
 # 可选项: "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"
-# 默认: "WARNING"
+# 默认: "INFO"
 level = "DEBUG"
-# 日志格式(string)
-# 为FormatStringSyntax形式的字符串
+# 文本日志格式(string)
+# 为brace-enclosed形式的字符串
 # 可选项: asctime,时间;levelname,等级;name,名称;message,消息;
 # 默认: "{levelname}: {message}"
-format = "{asctime} {name} {levelname}: {message}"
+text_format = "{asctime} {name} {levelname}: {message}"
 # 日志日期格式(string)
 # 为StringFormatTime形式的字符串
 # 默认: "%Y-%m-%d %H:%M:%S"
@@ -36,14 +40,14 @@ msg_filters = []
 [[logs]]
 output = "E:\\abc.log"
 level = "DEBUG"
-format = "{asctime} {levelname}: {message}"
+text_format = "{asctime} {levelname}: {message}"
 
 
 # 监视器(list[object])
 [[watchers]]
 # 名称(string)
 # 格式: 常规字符串
-# 默认: "Watcher#+数组索引号"
+# 默认: "Watcher_数组索引号"
 # name = "watcher_name"
 # 间隔时间(number)
 # 单位: 秒
@@ -61,11 +65,11 @@ tolerance = 3
 #     ==, 判断集合是否相等; !=, 判断集合是否不相等;
 #     <=, 判断集合的子集; >=, 判断集合的超集;
 #     <, 判断集合的真子集; >, 判断集合的真超集;
-# 默认: "fetch_1 & fetch_2 == empty"
+# 默认: "fetch_0 & fetch_1 == empty"
 expression = "fetch_0 & fetch_1 == empty"
 
-# 获取当前(list[object])
-[[watchers.fetches]]
+# 获取操作(list[object])
+[[watchers.fetches.group_1]]
 # 插件类型名称
 # 必选项, 且不能为空
 plugin = "echo"
@@ -88,30 +92,22 @@ strategy = "continue"
 # 插件参数
 arg1 = "fetch_1 => {}"
 
-# 获取当前(list[object])
-[[watchers.fetches]]
-# 插件类型名称
-# 必选项, 且不能为空
+[[watchers.fetches.group_1]]
 plugin = "echo"
-# 超时时间(number)
-# 单位: 秒
-# 默认: 60
 timeout = 120
-# 重试次数(number)
-# 单位: 次
-# 默认: 0
 retries = 3
-# 重试间隔(number)
-# 单位: 秒
-# 默认: 1
 delay = 1
-# 执行策略(string)
-# 可选项: continue/success_stop/failure_stop
-# 默认: "continue"
 strategy = "continue"
-# 插件参数
 arg1 = "fetch_2 => {fetches}"
 arg2 = "fetch_2 => {fetches[0].exception}"
+
+[[watchers.fetches.group_2]]
+plugin = "echo"
+timeout = 120
+retries = 3
+delay = 1
+strategy = "continue"
+arg1 = "group_2"
 
 
 # 更新操作(list[object])
