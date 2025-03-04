@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Iterable
+from typing import TYPE_CHECKING, Any, Iterable, Mapping
 
 if TYPE_CHECKING:
     from pwt.dynamic_watch_expression.expression import Expression
@@ -14,7 +14,7 @@ class Context:
     interval: float
     tolerance: int
     expression: "Expression"
-    fetches: Iterable["PluginBase"]
-    executes: Iterable["PluginBase"]
+    fetches: Mapping[str, Iterable["PluginBase"]]
+    executes: Mapping[str, Iterable["PluginBase"]]
     attempts: int
-    extra: dict[str, Any]
+    extra: Mapping[str, Any]

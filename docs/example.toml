@@ -1,3 +1,65 @@
+# logs: list[
+#     list[
+#         Log{
+#             output: string,
+#             output_format: string,
+#             level: string,
+#             text_format: string,
+#             data_format: string,
+#             level_filters: list[string],
+#             name_filters: list[string],
+#             msg_filters: list[string],
+#         }
+#     ]
+# ]
+# watchers: list[
+#     list[
+#         Watcher{
+#             name: string,
+#             interval: float,
+#             tolerance: int,
+#             expression: string,
+#             fetches: list[
+#                 Group{
+#                     plugin: string,
+#                     timeout: float,
+#                     retries: int,
+#                     delay: float,
+#                     strategy: string,
+#                     actions: list[
+#                         Action{
+#                             timeout: float,
+#                             retries: int,
+#                             delay: float,
+#                             strategy: string,
+#                             plugin: string,
+#                             **: Any
+#                         }
+#                     ]
+#                 }
+#             ]
+#             executes: list[
+#                 Group{
+#                     plugin: string,
+#                     timeout: float,
+#                     retries: int,
+#                     delay: float,
+#                     strategy: string,
+#                     actions: list[
+#                         Action{
+#                             timeout: float,
+#                             retries: int,
+#                             delay: float,
+#                             strategy: string,
+#                             plugin: string,
+#                             **: Any
+#                         }
+#                     ]
+#                 }
+#             ]
+#         }
+#     ]
+# ]
 
 # 日志(list[object])
 [[logs]]
@@ -18,11 +80,11 @@ level = "DEBUG"
 # 为brace-enclosed形式的字符串
 # 可选项: asctime,时间;levelname,等级;name,名称;message,消息;
 # 默认: "{levelname}: {message}"
-text_format = "{asctime} {name} {levelname}: {message}"
+text_format = "{asctime}.{msecs:03.0f} {name} {levelname}: {message}"
 # 日志日期格式(string)
 # 为StringFormatTime形式的字符串
 # 默认: "%Y-%m-%d %H:%M:%S"
-data_format = ""
+date_format = "%Y-%m-%d %H:%M:%S"
 # 日志等级过滤(list[string])
 # 指定启用的日志等级;
 # 可选项: "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"
@@ -39,6 +101,7 @@ msg_filters = []
 
 [[logs]]
 output = "E:\\abc.log"
+output_format="json"
 level = "DEBUG"
 text_format = "{asctime} {levelname}: {message}"
 
@@ -48,13 +111,13 @@ text_format = "{asctime} {levelname}: {message}"
 # 名称(string)
 # 格式: 常规字符串
 # 默认: "Watcher_数组索引号"
-# name = "watcher_name"
+name = "watcher_name"
 # 间隔时间(number)
 # 单位: 秒
 # 默认: 120
 interval = 5
 # 容忍次数(number)
-# 单位: 秒
+# 单位: 次
 # 默认: 0
 tolerance = 3
 # 表达式(string)
@@ -65,14 +128,15 @@ tolerance = 3
 #     ==, 判断集合是否相等; !=, 判断集合是否不相等;
 #     <=, 判断集合的子集; >=, 判断集合的超集;
 #     <, 判断集合的真子集; >, 判断集合的真超集;
-# 默认: "fetch_0 & fetch_1 == empty"
-expression = "fetch_0 & fetch_1 == empty"
+# 默认: "empty != empty"
+expression = "empty != empty"
+
 
 # 获取操作(list[object])
-[[watchers.fetches.group_1]]
-# 插件类型名称
-# 必选项, 且不能为空
-plugin = "echo"
+[[watchers.fetches]]
+# 操作组名称(string)
+# 必选项, 字母数字下划线(3-15)
+name = "group_1"
 # 超时时间(number)
 # 单位: 秒
 # 默认: 60
@@ -89,32 +153,37 @@ delay = 1
 # 可选项: continue/success_stop/failure_stop
 # 默认: "continue"
 strategy = "continue"
-# 插件参数
-arg1 = "fetch_1 => {}"
 
-[[watchers.fetches.group_1]]
-plugin = "echo"
+[[watchers.fetches.actions]]
+# 超时时间(number)
+# 单位: 秒
+# 默认: None
 timeout = 120
+# 重试次数(number)
+# 单位: 次
+# 默认: None
 retries = 3
+# 重试间隔(number)
+# 单位: 秒
+# 默认: None
 delay = 1
+# 执行策略(string)
+# 可选项: continue/success_stop/failure_stop
+# 默认: None
 strategy = "continue"
-arg1 = "fetch_2 => {fetches}"
-arg2 = "fetch_2 => {fetches[0].exception}"
-
-[[watchers.fetches.group_2]]
+# 插件名称(string)
+# 必选项, 字母数字下划线(3-15)
 plugin = "echo"
-timeout = 120
-retries = 3
-delay = 1
-strategy = "continue"
-arg1 = "group_2"
+# 插件参数(Any)
+arg1 = "arg1"
+arg2 = "arg2"
 
 
 # 更新操作(list[object])
 [[watchers.executes]]
-# 插件类型名称
-# 必选项, 且不能为空
-plugin = "echo"
+# 操作组名称(string)
+# 必选项, 字母数字下划线(3-15)
+name = "group_1"
 # 超时时间(number)
 # 单位: 秒
 # 默认: 60
@@ -131,9 +200,27 @@ delay = 1
 # 可选项: continue/success_stop/failure_stop
 # 默认: "continue"
 strategy = "continue"
-# 插件参数
+
+[[watchers.executes.actions]]
+# 超时时间(number)
+# 单位: 秒
+# 默认: None
+timeout = 120
+# 重试次数(number)
+# 单位: 次
+# 默认: None
+retries = 3
+# 重试间隔(number)
+# 单位: 秒
+# 默认: None
+delay = 1
+# 执行策略(string)
+# 可选项: continue/success_stop/failure_stop
+# 默认: None
+strategy = "continue"
+# 插件名称(string)
+# 必选项, 字母数字下划线(3-15)
+plugin = "echo"
+# 插件参数(Any)
 arg1 = "arg1"
 arg2 = "arg2"
-
-# [[watchers]]
-# expression = "fetch_1 & fetch_2 == empty"

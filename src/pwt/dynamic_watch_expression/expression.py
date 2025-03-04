@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Sequence
+from typing import Any, Iterable, Mapping
 
 from lark import Lark, Token, Transformer
 
@@ -16,11 +16,9 @@ _GRAMMAR = r"""
                 | calculation "-" factor    -> difference
                 | calculation "^" factor    -> symmetric_difference
     ?factor: literal | "(" calculation ")"
-    ?literal: variable | empty
-    # variable: /fetch_[0-9]+/
-    variable: "fetch_" INT
+    ?literal: empty | variable
     empty: "empty"
-    %import common.INT
+    variable: /[A-Za-z0-9_]{3,15}/
     %import common.WS
     %ignore WS
 """
@@ -33,13 +31,13 @@ class _EvalTransformer(Transformer[Token, bool]):
     用于评估和转换语法树的类
     """
 
-    def __init__(self, variables: Sequence[Iterable[Any]]) -> None:
+    def __init__(self, variables: Mapping[str, Iterable[Any]]) -> None:
         super().__init__()
         self._variables = variables
 
     def variable(self, args):
         if isinstance(args[0], Token):
-            return set(self._variables[int(args[0])])
+            return set(self._variables[args[0]])
         return args[0]
 
     def empty(self, _):
@@ -96,7 +94,7 @@ class Expression:
         self.expression = expression
         self._parse_tree = _lark.parse(self.expression)
 
-    def evaluate(self, variables: Sequence[Iterable[Any]]) -> bool:
+    def evaluate(self, variables: Mapping[str, Iterable[Any]]) -> bool:
         """
         使用给定的字面量评估表达式
 
@@ -105,7 +103,7 @@ class Expression:
         Returns:
             表达式的评估结果, `True`表示表达式为真, `False`表示表达式为假.
         Raises:
-            VisitError: 如果评估过程中发生错误.  # TODO: 需要重新检查异常抛出类型
+            VisitError: 如果评估过程中发生错误.
         """
 
         transformer = _EvalTransformer(variables)
