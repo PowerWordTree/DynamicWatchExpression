@@ -21,17 +21,14 @@
 #             expression: string,
 #             fetches: list[
 #                 Group{
-#                     plugin: string,
-#                     timeout: float,
-#                     retries: int,
-#                     delay: float,
-#                     strategy: string,
+#                     name: string,
+#                     chain_strategy: string,
+#                     error_strategy: string,
 #                     actions: list[
 #                         Action{
 #                             timeout: float,
 #                             retries: int,
 #                             delay: float,
-#                             strategy: string,
 #                             plugin: string,
 #                             **: Any
 #                         }
@@ -40,17 +37,14 @@
 #             ]
 #             executes: list[
 #                 Group{
-#                     plugin: string,
-#                     timeout: float,
-#                     retries: int,
-#                     delay: float,
-#                     strategy: string,
+#                     name: string,
+#                     chain_strategy: string,
+#                     error_strategy: string,
 #                     actions: list[
 #                         Action{
 #                             timeout: float,
 #                             retries: int,
 #                             delay: float,
-#                             strategy: string,
 #                             plugin: string,
 #                             **: Any
 #                         }
@@ -101,7 +95,7 @@ msg_filters = []
 
 [[logs]]
 output = "E:\\abc.log"
-output_format="json"
+output_format = "json"
 level = "DEBUG"
 text_format = "{asctime} {levelname}: {message}"
 
@@ -109,8 +103,7 @@ text_format = "{asctime} {levelname}: {message}"
 # 监视器(list[object])
 [[watchers]]
 # 名称(string)
-# 格式: 常规字符串
-# 默认: "Watcher_数组索引号"
+# 必选项, 字母数字下划线(3-15)
 name = "watcher_name"
 # 间隔时间(number)
 # 单位: 秒
@@ -137,6 +130,23 @@ expression = "empty != empty"
 # 操作组名称(string)
 # 必选项, 字母数字下划线(3-15)
 name = "group_1"
+# 执行策略(string)
+# 可选项:
+#   continue: 无条件继续执行
+#   success_stop: 成功时停止执行
+#   failure_stop: 失败时停止执行
+# 默认: "continue"
+chain_strategy = "continue"
+# 评估发生错误时的处理策略(string)
+# 可选项:
+#   skip: 发生错误时不重置计数
+#   reset: 发生错误时重置计数
+#   fetch_reset: 仅fetch发生错误时重置计数
+#   execute_reset: 仅execute发生错误时重置计数
+# 默认: skip
+error_strategy = "skip"
+
+[[watchers.fetches.actions]]
 # 超时时间(number)
 # 单位: 秒
 # 默认: 60
@@ -149,28 +159,6 @@ retries = 3
 # 单位: 秒
 # 默认: 1
 delay = 1
-# 执行策略(string)
-# 可选项: continue/success_stop/failure_stop
-# 默认: "continue"
-strategy = "continue"
-
-[[watchers.fetches.actions]]
-# 超时时间(number)
-# 单位: 秒
-# 默认: None
-timeout = 120
-# 重试次数(number)
-# 单位: 次
-# 默认: None
-retries = 3
-# 重试间隔(number)
-# 单位: 秒
-# 默认: None
-delay = 1
-# 执行策略(string)
-# 可选项: continue/success_stop/failure_stop
-# 默认: None
-strategy = "continue"
 # 插件名称(string)
 # 必选项, 字母数字下划线(3-15)
 plugin = "echo"
@@ -184,6 +172,23 @@ arg2 = "arg2"
 # 操作组名称(string)
 # 必选项, 字母数字下划线(3-15)
 name = "group_1"
+# 执行策略(string)
+# 可选项:
+#   continue: 无条件继续执行
+#   success_stop: 成功时停止执行
+#   failure_stop: 失败时停止执行
+# 默认: "continue"
+chain_strategy = "continue"
+# 评估发生错误时的处理策略(string)
+# 可选项:
+#   skip: 发生错误时不重置计数
+#   reset: 发生错误时重置计数
+#   fetch_reset: 仅fetch发生错误时重置计数
+#   execute_reset: 仅execute发生错误时重置计数
+# 默认: skip
+error_strategy = "skip"
+
+[[watchers.executes.actions]]
 # 超时时间(number)
 # 单位: 秒
 # 默认: 60
@@ -196,28 +201,6 @@ retries = 3
 # 单位: 秒
 # 默认: 1
 delay = 1
-# 执行策略(string)
-# 可选项: continue/success_stop/failure_stop
-# 默认: "continue"
-strategy = "continue"
-
-[[watchers.executes.actions]]
-# 超时时间(number)
-# 单位: 秒
-# 默认: None
-timeout = 120
-# 重试次数(number)
-# 单位: 次
-# 默认: None
-retries = 3
-# 重试间隔(number)
-# 单位: 秒
-# 默认: None
-delay = 1
-# 执行策略(string)
-# 可选项: continue/success_stop/failure_stop
-# 默认: None
-strategy = "continue"
 # 插件名称(string)
 # 必选项, 字母数字下划线(3-15)
 plugin = "echo"

@@ -18,7 +18,6 @@ from pwt.dynamic_watch_expression import constants
 from pwt.dynamic_watch_expression.utils import (
     casefold_in_list,
     regex_match,
-    set_field_by_index,
     verify_field_unique,
     verify_regex,
     verify_reserved_keywords,
@@ -115,20 +114,16 @@ class BaseModelEx(BaseModel):
 
 
 class Action(BaseModelEx, extra="allow"):
-    strategy: Annotated[
-        constants.GROUP_STRATEGY_TYPE | None,
-        convert(str.lower),
-    ] = constants.ACTION_STRATEGY_DEFAULT
     timeout: Annotated[
-        float | None,
+        float,
         Field(gt=0),
     ] = constants.ACTION_TIMEOUT_DEFAULT
     retries: Annotated[
-        int | None,
+        int,
         Field(gt=0),
     ] = constants.ACTION_RETRIES_DEFAULT
     delay: Annotated[
-        float | None,
+        float,
         Field(gt=0),
     ] = constants.ACTION_DELAY_DEFAULT
     plugin: Annotated[
@@ -143,22 +138,14 @@ class Group(BaseModelEx):
         Field(pattern=constants.GROUP_NAME_PATTERN),
         check(verify_reserved_keywords, lst=constants.GROUP_NAME_RESERVED),
     ]
-    strategy: Annotated[
-        constants.GROUP_STRATEGY_TYPE,
+    chain_strategy: Annotated[
+        constants.GROUP_CHAIN_STRATEGY_TYPE,
         convert(str.lower),
-    ] = constants.GROUP_STRATEGY_DEFAULT
-    timeout: Annotated[
-        float,
-        Field(gt=0),
-    ] = constants.GROUP_TIMEOUT_DEFAULT
-    retries: Annotated[
-        int,
-        Field(gt=0),
-    ] = constants.GROUP_RETRIES_DEFAULT
-    delay: Annotated[
-        float,
-        Field(gt=0),
-    ] = constants.GROUP_DELAY_DEFAULT
+    ] = constants.GROUP_CHAIN_STRATEGY_DEFAULT
+    error_strategy: Annotated[
+        constants.GROUP_ERROR_STRATEGY_TYPE,
+        convert(str.lower),
+    ] = constants.GROUP_ERROR_STRATEGY_DEFAULT
     actions: Annotated[
         list[Action],
         Field(min_length=1),
@@ -169,7 +156,7 @@ class Watcher(BaseModelEx):
     name: Annotated[
         str,
         Field(pattern=constants.WATCHER_NAME_PATTERN),
-    ] = constants.WATCHER_NAME_DEFAULT
+    ]
     interval: Annotated[
         float,
         Field(gt=0),
@@ -214,7 +201,7 @@ class Log(BaseModelEx):
     text_format: Annotated[
         str,
         check(lambda value: logging.StrFormatStyle(value).validate()),
-    ] = constants.LOG_FORMAT_DEFAULT
+    ] = constants.LOG_TEXT_FORMAT_DEFAULT
     date_format: Annotated[
         str | None,
         check(datetime.now().strftime),
@@ -243,12 +230,9 @@ class Config(BaseModelEx):
     ] = [Log()]
     watchers: Annotated[
         list[Watcher],
-        convert(
-            set_field_by_index,
-            format=constants.WATCHER_NAME_FORMAT,
-            key_path="name",
-            only_empty=True,
-        ),
         Field(min_length=1),
         check(verify_field_unique, key_path="name"),
     ]
+
+
+# TODO: verify_field_unique需要重构, 未完善异常处理
