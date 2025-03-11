@@ -16,9 +16,9 @@ _GRAMMAR = r"""
                 | calculation "-" factor    -> difference
                 | calculation "^" factor    -> symmetric_difference
     ?factor: literal | "(" calculation ")"
-    ?literal: empty | variable
-    empty: "empty"
-    variable: /[A-Za-z0-9_]{3,15}/
+    ?literal: EMPTY | VARIABLE
+    EMPTY: "empty"
+    VARIABLE: /[A-Za-z0-9_]{1,31}/
     %import common.WS
     %ignore WS
 """
@@ -35,43 +35,41 @@ class _EvalTransformer(Transformer[Token, bool]):
         super().__init__()
         self._variables = variables
 
-    def variable(self, args):
-        if isinstance(args[0], Token):
-            return set(self._variables[args[0]])
-        return args[0]
+    def VARIABLE(self, token: Token):
+        return set(self._variables.get(token, set()))
 
-    def empty(self, _):
+    def EMPTY(self, _):
         return set()
 
-    def equal(self, args):  # 相等
-        return args[0] == args[1]
+    def equal(self, nodes: list[set]):  # 相等
+        return nodes[0] == nodes[1]
 
-    def not_equal(self, args):  # 不相等
-        return args[0] != args[1]
+    def not_equal(self, nodes: list[set]):  # 不相等
+        return nodes[0] != nodes[1]
 
-    def subset(self, args):  # 子集
-        return args[0] <= args[1]
+    def subset(self, nodes: list[set]):  # 子集
+        return nodes[0] <= nodes[1]
 
-    def superset(self, args):  # 超集
-        return args[0] >= args[1]
+    def superset(self, nodes: list[set]):  # 超集
+        return nodes[0] >= nodes[1]
 
-    def proper_subset(self, args):  # 真子集
-        return args[0] < args[1]
+    def proper_subset(self, nodes: list[set]):  # 真子集
+        return nodes[0] < nodes[1]
 
-    def proper_superset(self, args):  # 真超集
-        return args[0] > args[1]
+    def proper_superset(self, nodes: list[set]):  # 真超集
+        return nodes[0] > nodes[1]
 
-    def intersection(self, args):  # 交集
-        return args[0] & args[1]
+    def intersection(self, nodes: list[set]):  # 交集
+        return nodes[0] & nodes[1]
 
-    def union(self, args):  # 并集
-        return args[0] | args[1]
+    def union(self, nodes: list[set]):  # 并集
+        return nodes[0] | nodes[1]
 
-    def difference(self, args):  # 差集
-        return args[0] - args[1]
+    def difference(self, nodes: list[set]):  # 差集
+        return nodes[0] - nodes[1]
 
-    def symmetric_difference(self, args):  # 对称差集
-        return args[0] ^ args[1]
+    def symmetric_difference(self, nodes: list[set]):  # 对称差集
+        return nodes[0] ^ nodes[1]
 
 
 class Expression:
@@ -94,16 +92,25 @@ class Expression:
         self.expression = expression
         self._parse_tree = _lark.parse(self.expression)
 
+    @property
+    def variables(self) -> set[str]:
+        """表达式中的所有变量名称集合"""
+        return {
+            token.value
+            for token in self._parse_tree.scan_values(
+                lambda t: isinstance(t, Token) and t.type == "VARIABLE"
+            )
+        }
+
     def evaluate(self, variables: Mapping[str, Iterable[Any]]) -> bool:
         """
         使用给定的字面量评估表达式
 
         Args:
-            variables: 一个包含可迭代对象的序列, 每个可迭代对象代表一个字面量的值.
+            variables: 一个字面量字符串对应可迭代对象的字典
+                每个可迭代对象代表一个字面量的值, 默认为空集合.
         Returns:
             表达式的评估结果, `True`表示表达式为真, `False`表示表达式为假.
-        Raises:
-            VisitError: 如果评估过程中发生错误.
         """
 
         transformer = _EvalTransformer(variables)
