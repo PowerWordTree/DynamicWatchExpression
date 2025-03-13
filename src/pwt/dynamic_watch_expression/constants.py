@@ -20,12 +20,14 @@ ACTION_RETRIES_DEFAULT = 0
 ACTION_DELAY_DEFAULT = 1
 ACTION_PLUGIN_PATTERN = r"^[a-zA-Z0-9_]{3,15}$"
 
-GROUP_NAME_PATTERN = r"^[a-zA-Z0-9_]{3,15}$"
+GROUP_NAME_PATTERN = r"^[a-zA-Z0-9_]{1,31}$"
 GROUP_NAME_RESERVED = "empty"
 GROUP_CHAIN_STRATEGY_DEFAULT = "continue"
 GROUP_CHAIN_STRATEGY_TYPE = Literal["continue", "success_stop", "failure_stop"]
+GROUP_RESULT_STRATEGY_DEFAULT = "merge"
+GROUP_RESULT_STRATEGY_TYPE = Literal["merge", "overwrite"]
 GROUP_ERROR_STRATEGY_DEFAULT = "skip"
-GROUP_ERROR_STRATEGY_TYPE = Literal["skip", "reset", "fetch_reset", "execute_reset"]
+GROUP_ERROR_STRATEGY_TYPE = Literal["skip", "reset"]
 
 WATCHER_NAME_PATTERN = r"^[a-zA-Z0-9_]{3,15}$"
 WATCHER_INTERVAL_DEFAULT = 120

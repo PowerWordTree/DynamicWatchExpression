@@ -142,6 +142,10 @@ class Group(BaseModelEx):
         constants.GROUP_CHAIN_STRATEGY_TYPE,
         convert(str.lower),
     ] = constants.GROUP_CHAIN_STRATEGY_DEFAULT
+    result_strategy: Annotated[
+        constants.GROUP_RESULT_STRATEGY_TYPE,
+        convert(str.lower),
+    ] = constants.GROUP_RESULT_STRATEGY_DEFAULT
     error_strategy: Annotated[
         constants.GROUP_ERROR_STRATEGY_TYPE,
         convert(str.lower),
